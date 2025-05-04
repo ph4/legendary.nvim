@@ -78,19 +78,28 @@ return function(opts)
     if mod then
       local mod_stripped
       local prefix = ''
+      local directions
       if type(mod) == 'string' then
         mod_stripped = mod:match('<(.*)>') or mod -- strip off surrounding < > if they exist
+        directions = opts.directions
       else
         prefix = mod.prefix or ''
         mod_stripped = mod.mod:match('<(.*)>') or mod.mod -- strip off surrounding < > if they exist
+        directions = mod.directions or opts.directions
       end
 
       if mod_stripped == nil then
         mod_stripped = ''
       end
 
-      for idx, direction in ipairs(opts.directions) do
-        local keys = string.format(#mod_stripped > 0 and '%s<%s-%s>' or '%s%s%s', prefix, mod_stripped, direction)
+      for idx, direction in ipairs(directions) do
+        local direction_stripped = direction:match('^<(.*)>$') or direction
+        local keys = string.format(
+          #mod_stripped > 0 and '%s<%s-%s>' or '%s%s%s',
+          prefix,
+          mod_stripped,
+          #mod_stripped > 0 and direction_stripped or direction
+        )
         local dir_str = direction_map[idx]
         local smart_splits_action
         local desc
